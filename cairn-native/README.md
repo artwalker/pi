@@ -1,6 +1,6 @@
-# pi-native
+# cairn-native
 
-A native **C++/C** implementation of the Pi agent core. This is a foundation
+A native **C++/C** implementation of the Cairn agent core. This is a foundation
 that mirrors the TypeScript packages (`ai`, `agent`, `durable`, `tui`,
 `coding-agent`) while deliberately splitting work between the two languages by
 their strengths:
@@ -9,7 +9,7 @@ their strengths:
 |---|---|---|
 | Terminal control (raw mode, size) | **C** (`src/c/terminal.c`) | Thin `termios`/`ioctl` syscall layer; nothing for C++ to abstract. |
 | Subprocess execution (tool sandbox) | **C** (`src/c/subprocess.c`) | `fork`/`exec`/`pipe` fd plumbing; manual control matters. |
-| Plugin boundary | **C ABI** (`include/pi/c/plugin.h`) | The C ABI is stable across compilers/versions; the C++ ABI is not. Extensions ship as `.so` loaded via `dlopen`. |
+| Plugin boundary | **C ABI** (`include/cairn/c/plugin.h`) | The C ABI is stable across compilers/versions; the C++ ABI is not. Extensions ship as `.so` loaded via `dlopen`. |
 | LLM client (HTTP + SSE streaming, tool-calls) | **C++** (`src/cpp/llm_client.cpp`) | RAII over libcurl, incremental SSE parsing, `std::function` callbacks. |
 | Agent loop + tool registry | **C++** (`src/cpp/agent.cpp`) | STL containers, `std::function`, exception-based error handling. |
 | Durable session store | **C++** over SQLite (`src/cpp/session_store.cpp`) | RAII wrapper around the SQLite C library. |
@@ -35,37 +35,37 @@ cmake -S . -B build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 cmake --build build -j
 ```
 
-Produces `build/pi` (the agent CLI) and `build/wordcount.so` (an example plugin).
+Produces `build/cairn` (the agent CLI) and `build/wordcount.so` (an example plugin).
 
 ## Run
 
-`pi` speaks the OpenAI `/v1/chat/completions` wire protocol with `stream=true`,
+`cairn` speaks the OpenAI `/v1/chat/completions` wire protocol with `stream=true`,
 so it works against any compatible endpoint.
 
 ```bash
 # Against a real provider:
-export PI_BASE_URL=https://api.openai.com
-export PI_API_KEY=sk-...
-export PI_MODEL=gpt-4o-mini
-./build/pi                                   # interactive REPL
-./build/pi --prompt "list files with a shell command"   # one-shot
+export CAIRN_BASE_URL=https://api.openai.com
+export CAIRN_API_KEY=sk-...
+export CAIRN_MODEL=gpt-4o-mini
+./build/cairn                                   # interactive REPL
+./build/cairn --prompt "list files with a shell command"   # one-shot
 
 # Load a runtime plugin (C-ABI shared object):
-./build/pi --plugin ./build/wordcount.so --prompt "count the words here"
+./build/cairn --plugin ./build/wordcount.so --prompt "count the words here"
 ```
 
 ## Built-in tools
 
 The agent ships with these tools (see `src/cpp/builtin_tools.cpp`), registered
-through `pi::makeBuiltinTools()`. Plugins add more over the C ABI.
+through `cairn::makeBuiltinTools()`. Plugins add more over the C ABI.
 
 `run_shell` runs a command through the C subprocess layer. `read_file` returns
 a file's contents. `write_file` creates or overwrites a file, making parent
 directories. `edit_file` replaces exactly one occurrence of a substring and
 errors on zero or multiple matches. `list_dir` lists directory entries.
 
-Environment / flags: `PI_BASE_URL` / `--base-url`, `PI_API_KEY`, `PI_MODEL` /
-`--model`, `PI_DB` (SQLite path), `--session <id>`, `--plugin <path.so>`,
+Environment / flags: `CAIRN_BASE_URL` / `--base-url`, `CAIRN_API_KEY`, `CAIRN_MODEL` /
+`--model`, `CAIRN_DB` (SQLite path), `--session <id>`, `--plugin <path.so>`,
 `--prompt <text>` (one-shot).
 
 ## End-to-end demo without credentials
@@ -76,14 +76,14 @@ test stand-in, **not** part of the agent.
 
 ```bash
 python3 test/mock_server.py &          # listens on 127.0.0.1:8799
-./build/pi --base-url http://127.0.0.1:8799 --prompt "greet me from the shell"
+./build/cairn --base-url http://127.0.0.1:8799 --prompt "greet me from the shell"
 ```
 
 ## Verify
 
 `test/verify_fs_tools.py` is a deterministic end-to-end check. It scripts an
 OpenAI-compatible server through a write, read, edit, and list sequence, runs
-the real `pi` binary, and asserts the on-disk result.
+the real `cairn` binary, and asserts the on-disk result.
 
 ```bash
 python3 test/verify_fs_tools.py   # prints RESULT: PASS / FAIL, exits nonzero on failure

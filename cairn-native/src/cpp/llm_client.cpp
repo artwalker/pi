@@ -1,4 +1,4 @@
-#include "pi/llm_client.hpp"
+#include "cairn/llm_client.hpp"
 
 #include <curl/curl.h>
 
@@ -6,7 +6,7 @@
 #include <map>
 #include <stdexcept>
 
-namespace pi {
+namespace cairn {
 
 namespace {
 
@@ -151,4 +151,4 @@ AssistantTurn LlmClient::chat(const Json& messages,
     return turn;
 }
 
-}  // namespace pi
+}  // namespace cairn

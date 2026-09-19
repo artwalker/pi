@@ -2,7 +2,7 @@
 """Deterministic end-to-end check for the native filesystem tools.
 
 Stands up an OpenAI-compatible SSE server that drives the agent through a
-write -> read -> edit -> list sequence, runs the real `pi` binary against it,
+write -> read -> edit -> list sequence, runs the real `cairn` binary against it,
 then asserts the on-disk result. Exits nonzero on any failure.
 """
 import json
@@ -16,7 +16,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = 8801
-WORKDIR = tempfile.mkdtemp(prefix="pi_fs_verify_")
+WORKDIR = tempfile.mkdtemp(prefix="cairn_fs_verify_")
 TARGET = os.path.join(WORKDIR, "notes", "hello.txt")
 
 
@@ -36,7 +36,7 @@ def tool_call(name, args):
 SCRIPT = [
     ("write_file", {"path": TARGET, "content": "hello\nworld\n"}),
     ("read_file", {"path": TARGET}),
-    ("edit_file", {"path": TARGET, "old": "world", "new": "pi"}),
+    ("edit_file", {"path": TARGET, "old": "world", "new": "there"}),
     ("list_dir", {"path": os.path.join(WORKDIR, "notes")}),
 ]
 
@@ -75,8 +75,8 @@ def main():
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     time.sleep(0.3)
 
-    binary = os.path.join(os.path.dirname(__file__), "..", "build", "pi")
-    env = dict(os.environ, PI_DB=os.path.join(WORKDIR, "s.db"))
+    binary = os.path.join(os.path.dirname(__file__), "..", "build", "cairn")
+    env = dict(os.environ, CAIRN_DB=os.path.join(WORKDIR, "s.db"))
     proc = subprocess.run(
         [binary, "--base-url", f"http://127.0.0.1:{PORT}", "--session", "fs",
          "--prompt", "create notes/hello.txt, read it, fix a typo, list the dir"],
@@ -90,8 +90,8 @@ def main():
         failures.append(f"file not created: {TARGET}")
     else:
         got = open(TARGET).read()
-        if got != "hello\npi\n":
-            failures.append(f"edited content mismatch: {got!r} != 'hello\\npi\\n'")
+        if got != "hello\nthere\n":
+            failures.append(f"edited content mismatch: {got!r} != 'hello\\nthere\\n'")
     if "ok: wrote" not in proc.stdout:
         failures.append("write_file result not observed in output")
     if "ok: edited" not in proc.stdout:

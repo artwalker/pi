@@ -12,7 +12,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace pi {
+namespace cairn {
 
 using Json = nlohmann::json;
 
@@ -56,4 +56,4 @@ private:
     std::vector<Tool> tools_;
 };
 
-}  // namespace pi
+}  // namespace cairn

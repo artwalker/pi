@@ -1,4 +1,4 @@
-#include "pi/builtin_tools.hpp"
+#include "cairn/builtin_tools.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-#include "pi/c/subprocess.h"
+#include "cairn/c/subprocess.h"
 
 namespace fs = std::filesystem;
 
-namespace pi {
+namespace cairn {
 
 namespace {
 
@@ -26,9 +26,9 @@ Tool makeRunShell() {
     tool.invoke = [](const Json& args) -> std::string {
         std::string command = args.value("command", "");
         if (command.empty()) return "error: missing 'command'";
-        pi_subprocess_result r = pi_subprocess_run(command.c_str());
+        cairn_subprocess_result r = cairn_subprocess_run(command.c_str());
         std::string out(r.output ? r.output : "", r.output_len);
-        pi_subprocess_free(&r);
+        cairn_subprocess_free(&r);
         return "exit_code=" + std::to_string(r.exit_code) + "\n" + out;
     };
     return tool;
@@ -168,4 +168,4 @@ std::vector<Tool> makeBuiltinTools() {
     };
 }
 
-}  // namespace pi
+}  // namespace cairn

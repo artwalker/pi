@@ -11,9 +11,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include "pi/tool.hpp"
+#include "cairn/tool.hpp"
 
-namespace pi {
+namespace cairn {
 
 struct ToolCall {
     std::string id;
@@ -42,4 +42,4 @@ private:
     std::string model_;
 };
 
-}  // namespace pi
+}  // namespace cairn

@@ -7,13 +7,13 @@
 #include <string>
 #include <utility>
 
-#include "pi/agent.hpp"
-#include "pi/builtin_tools.hpp"
-#include "pi/c/terminal.h"
-#include "pi/llm_client.hpp"
-#include "pi/plugin_loader.hpp"
-#include "pi/session_store.hpp"
-#include "pi/tool.hpp"
+#include "cairn/agent.hpp"
+#include "cairn/builtin_tools.hpp"
+#include "cairn/c/terminal.h"
+#include "cairn/llm_client.hpp"
+#include "cairn/plugin_loader.hpp"
+#include "cairn/session_store.hpp"
+#include "cairn/tool.hpp"
 
 namespace {
 
@@ -31,10 +31,10 @@ std::string envOr(const char* name, const std::string& fallback) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    std::string base_url = envOr("PI_BASE_URL", "http://127.0.0.1:8799");
-    std::string api_key = envOr("PI_API_KEY", "");
-    std::string model = envOr("PI_MODEL", "gpt-4o-mini");
-    std::string db_path = envOr("PI_DB", "pi-session.db");
+    std::string base_url = envOr("CAIRN_BASE_URL", "http://127.0.0.1:8799");
+    std::string api_key = envOr("CAIRN_API_KEY", "");
+    std::string model = envOr("CAIRN_MODEL", "gpt-4o-mini");
+    std::string db_path = envOr("CAIRN_DB", "cairn-session.db");
     std::string session = "default";
     std::string one_shot;
     std::string plugin_path;
@@ -49,13 +49,13 @@ int main(int argc, char** argv) {
         else if (a == "--base-url") base_url = next();
     }
 
-    pi::ToolRegistry tools;
-    for (auto& tool : pi::makeBuiltinTools()) {
+    cairn::ToolRegistry tools;
+    for (auto& tool : cairn::makeBuiltinTools()) {
         tools.add(std::move(tool));
     }
     if (!plugin_path.empty()) {
         try {
-            int n = pi::loadPlugin(plugin_path, tools);
+            int n = cairn::loadPlugin(plugin_path, tools);
             std::cerr << kDim << "[loaded plugin: " << plugin_path << " (+" << n
                       << " tool(s))]" << kReset << "\n";
         } catch (const std::exception& e) {
@@ -63,13 +63,13 @@ int main(int argc, char** argv) {
         }
     }
 
-    pi::LlmClient client(base_url, api_key, model);
-    pi::SessionStore store(db_path);
-    pi::Agent agent(client, tools, store,
-                    session, "You are Pi, a concise coding agent.");
+    cairn::LlmClient client(base_url, api_key, model);
+    cairn::SessionStore store(db_path);
+    cairn::Agent agent(client, tools, store,
+                    session, "You are Cairn, a concise coding agent.");
 
-    pi_term_size sz = pi_term_get_size();
-    std::cerr << kCyan << "Pi (native C/C++)  " << kReset << kDim << model
+    cairn_term_size sz = cairn_term_get_size();
+    std::cerr << kCyan << "Cairn (native C/C++)  " << kReset << kDim << model
               << "  @ " << base_url << "  [term " << sz.rows << "x" << sz.cols
               << "]" << kReset << "\n";
 

@@ -10,7 +10,7 @@
 
 struct sqlite3;
 
-namespace pi {
+namespace cairn {
 
 using Json = nlohmann::json;
 
@@ -32,4 +32,4 @@ private:
     sqlite3* db_ = nullptr;
 };
 
-}  // namespace pi
+}  // namespace cairn

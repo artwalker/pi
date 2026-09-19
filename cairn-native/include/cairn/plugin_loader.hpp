@@ -3,13 +3,13 @@
 
 #include <string>
 
-#include "pi/tool.hpp"
+#include "cairn/tool.hpp"
 
-namespace pi {
+namespace cairn {
 
-// dlopen the given .so, read its pi_plugin_register() manifest, and register
+// dlopen the given .so, read its cairn_plugin_register() manifest, and register
 // each exported tool into `registry`. Returns the number of tools added.
 // Throws std::runtime_error on load / ABI-version failure.
 int loadPlugin(const std::string& so_path, ToolRegistry& registry);
 
-}  // namespace pi
+}  // namespace cairn

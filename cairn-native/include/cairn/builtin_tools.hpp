@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "pi/tool.hpp"
+#include "cairn/tool.hpp"
 
-namespace pi {
+namespace cairn {
 
 std::vector<Tool> makeBuiltinTools();
 
-}  // namespace pi
+}  // namespace cairn

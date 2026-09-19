@@ -7,11 +7,11 @@
 #include <functional>
 #include <string>
 
-#include "pi/llm_client.hpp"
-#include "pi/session_store.hpp"
-#include "pi/tool.hpp"
+#include "cairn/llm_client.hpp"
+#include "cairn/session_store.hpp"
+#include "cairn/tool.hpp"
 
-namespace pi {
+namespace cairn {
 
 class Agent {
 public:
@@ -36,4 +36,4 @@ private:
     void record(const Json& message);
 };
 
-}  // namespace pi
+}  // namespace cairn

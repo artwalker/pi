@@ -1,4 +1,4 @@
-#include "pi/c/terminal.h"
+#include "cairn/c/terminal.h"
 
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -7,8 +7,8 @@
 static struct termios g_saved;
 static int            g_saved_valid = 0;
 
-pi_term_size pi_term_get_size(void) {
-    pi_term_size size;
+cairn_term_size cairn_term_get_size(void) {
+    cairn_term_size size;
     struct winsize ws;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0) {
         size.rows = ws.ws_row;
@@ -20,7 +20,7 @@ pi_term_size pi_term_get_size(void) {
     return size;
 }
 
-int pi_term_enable_raw(void) {
+int cairn_term_enable_raw(void) {
     if (!isatty(STDIN_FILENO)) {
         return -1;
     }
@@ -43,14 +43,14 @@ int pi_term_enable_raw(void) {
     return 0;
 }
 
-void pi_term_restore(void) {
+void cairn_term_restore(void) {
     if (g_saved_valid) {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &g_saved);
         g_saved_valid = 0;
     }
 }
 
-int pi_term_read_key(void) {
+int cairn_term_read_key(void) {
     unsigned char c;
     ssize_t n = read(STDIN_FILENO, &c, 1);
     if (n == 1) {

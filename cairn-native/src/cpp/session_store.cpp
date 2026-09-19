@@ -1,10 +1,10 @@
-#include "pi/session_store.hpp"
+#include "cairn/session_store.hpp"
 
 #include <sqlite3.h>
 
 #include <stdexcept>
 
-namespace pi {
+namespace cairn {
 
 SessionStore::SessionStore(const std::string& db_path) {
     if (sqlite3_open(db_path.c_str(), &db_) != SQLITE_OK) {
@@ -69,4 +69,4 @@ Json SessionStore::load(const std::string& session) {
     return out;
 }
 
-}  // namespace pi
+}  // namespace cairn

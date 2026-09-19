@@ -1,12 +1,12 @@
-#include "pi/c/subprocess.h"
+#include "cairn/c/subprocess.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
-pi_subprocess_result pi_subprocess_run(const char *command) {
-    pi_subprocess_result result;
+cairn_subprocess_result cairn_subprocess_run(const char *command) {
+    cairn_subprocess_result result;
     result.exit_code  = -1;
     result.output     = NULL;
     result.output_len = 0;
@@ -78,7 +78,7 @@ pi_subprocess_result pi_subprocess_run(const char *command) {
     return result;
 }
 
-void pi_subprocess_free(pi_subprocess_result *result) {
+void cairn_subprocess_free(cairn_subprocess_result *result) {
     if (result && result->output) {
         free(result->output);
         result->output     = NULL;

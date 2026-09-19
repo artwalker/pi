@@ -1,6 +1,6 @@
-#include "pi/agent.hpp"
+#include "cairn/agent.hpp"
 
-namespace pi {
+namespace cairn {
 
 Agent::Agent(LlmClient& client, ToolRegistry& tools, SessionStore& store,
              std::string session, std::string system_prompt)
@@ -75,4 +75,4 @@ std::string Agent::run(
     return "(stopped: tool-call limit reached)";
 }
 
-}  // namespace pi
+}  // namespace cairn

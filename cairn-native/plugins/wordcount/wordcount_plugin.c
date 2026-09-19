@@ -1,12 +1,12 @@
 /*
- * Example Pi plugin, compiled as a standalone shared object and loaded at
+ * Example Cairn plugin, compiled as a standalone shared object and loaded at
  * runtime via dlopen. It exposes a `word_count` tool. This is the concrete
  * answer to "how is a compiled agent self-extensible": a stable C ABI.
  *
  * Deliberately dependency-free C: it does its own tiny JSON string extraction
- * so a plugin author needs nothing but a C compiler and pi/c/plugin.h.
+ * so a plugin author needs nothing but a C compiler and cairn/c/plugin.h.
  */
-#include "pi/c/plugin.h"
+#include "cairn/c/plugin.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -61,7 +61,7 @@ static char *word_count_invoke(const char *args_json) {
 
 static void free_result(char *result) { free(result); }
 
-static const pi_plugin_tool k_tools[] = {
+static const cairn_plugin_tool k_tools[] = {
     {
         "word_count",
         "Count the words and characters in a piece of text.",
@@ -71,11 +71,11 @@ static const pi_plugin_tool k_tools[] = {
     },
 };
 
-static const pi_plugin_manifest k_manifest = {
-    PI_PLUGIN_ABI_VERSION,
+static const cairn_plugin_manifest k_manifest = {
+    CAIRN_PLUGIN_ABI_VERSION,
     "wordcount",
     k_tools,
     1,
 };
 
-const pi_plugin_manifest *pi_plugin_register(void) { return &k_manifest; }
+const cairn_plugin_manifest *cairn_plugin_register(void) { return &k_manifest; }
