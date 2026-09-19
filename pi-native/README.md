@@ -54,6 +54,16 @@ export PI_MODEL=gpt-4o-mini
 ./build/pi --plugin ./build/wordcount.so --prompt "count the words here"
 ```
 
+## Built-in tools
+
+The agent ships with these tools (see `src/cpp/builtin_tools.cpp`), registered
+through `pi::makeBuiltinTools()`. Plugins add more over the C ABI.
+
+`run_shell` runs a command through the C subprocess layer. `read_file` returns
+a file's contents. `write_file` creates or overwrites a file, making parent
+directories. `edit_file` replaces exactly one occurrence of a substring and
+errors on zero or multiple matches. `list_dir` lists directory entries.
+
 Environment / flags: `PI_BASE_URL` / `--base-url`, `PI_API_KEY`, `PI_MODEL` /
 `--model`, `PI_DB` (SQLite path), `--session <id>`, `--plugin <path.so>`,
 `--prompt <text>` (one-shot).
@@ -69,10 +79,23 @@ python3 test/mock_server.py &          # listens on 127.0.0.1:8799
 ./build/pi --base-url http://127.0.0.1:8799 --prompt "greet me from the shell"
 ```
 
+## Verify
+
+`test/verify_fs_tools.py` is a deterministic end-to-end check. It scripts an
+OpenAI-compatible server through a write, read, edit, and list sequence, runs
+the real `pi` binary, and asserts the on-disk result.
+
+```bash
+python3 test/verify_fs_tools.py   # prints RESULT: PASS / FAIL, exits nonzero on failure
+```
+
 ## Status
 
-Implemented: streaming client, tool-calling agent loop, C subprocess tool,
-C-ABI dlopen plugins, SQLite session persistence/resume, terminal-size aware CLI.
+Implemented: streaming client, tool-calling agent loop, filesystem tools
+(`read_file`, `write_file`, `edit_file`, `list_dir`) plus the `run_shell` C
+subprocess tool, C-ABI dlopen plugins, SQLite session persistence/resume, and a
+terminal-size aware CLI.
 
-Not yet ported from the TS packages: the differential TUI renderer, the multi
-provider model catalog, RPC client/server split, and richer built-in tools.
+Not yet ported from the TS packages: the differential TUI renderer with
+raw-mode line editing, the multi-provider model catalog, and the RPC
+client/server split.
