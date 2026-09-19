@@ -5,9 +5,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "pi/agent.hpp"
-#include "pi/c/subprocess.h"
+#include "pi/builtin_tools.hpp"
 #include "pi/c/terminal.h"
 #include "pi/llm_client.hpp"
 #include "pi/plugin_loader.hpp"
@@ -25,27 +26,6 @@ const char* kYellow = "\033[33m";
 std::string envOr(const char* name, const std::string& fallback) {
     const char* v = std::getenv(name);
     return v ? std::string(v) : fallback;
-}
-
-// Built-in tool backed by the C subprocess boundary layer.
-pi::Tool makeShellTool() {
-    pi::Tool tool;
-    tool.name = "run_shell";
-    tool.description = "Run a shell command and return its combined stdout/stderr.";
-    tool.parameters = {
-        {"type", "object"},
-        {"properties", {{"command", {{"type", "string"}, {"description", "The shell command to run"}}}}},
-        {"required", pi::Json::array({"command"})},
-    };
-    tool.invoke = [](const pi::Json& args) -> std::string {
-        std::string command = args.value("command", "");
-        if (command.empty()) return "error: missing 'command'";
-        pi_subprocess_result r = pi_subprocess_run(command.c_str());
-        std::string out(r.output ? r.output : "", r.output_len);
-        pi_subprocess_free(&r);
-        return "exit_code=" + std::to_string(r.exit_code) + "\n" + out;
-    };
-    return tool;
 }
 
 }  // namespace
@@ -70,7 +50,9 @@ int main(int argc, char** argv) {
     }
 
     pi::ToolRegistry tools;
-    tools.add(makeShellTool());
+    for (auto& tool : pi::makeBuiltinTools()) {
+        tools.add(std::move(tool));
+    }
     if (!plugin_path.empty()) {
         try {
             int n = pi::loadPlugin(plugin_path, tools);

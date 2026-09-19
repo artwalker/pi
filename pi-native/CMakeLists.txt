@@ -28,6 +28,7 @@ target_include_directories(pi_c PUBLIC include)
 # --- C++ core --------------------------------------------------------------
 add_executable(pi
   src/cpp/main.cpp
+  src/cpp/builtin_tools.cpp
   src/cpp/llm_client.cpp
   src/cpp/agent.cpp
   src/cpp/session_store.cpp
